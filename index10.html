@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>myMemoPad</title>
+  <script src="js/jquery-2.1.3.min.js"></script>
+  <link rel='stylesheet' href='css/reset.css'>
+  <link rel="stylesheet" href="css/sample2.css">
+</head>
+
+<body>
+  <header>
+    <h1>To do eraser</h1>
+  </header>
+  <!-- <main>
+    
+    <form action="cgi-bin/example.cgi" method="post" name="form1">
+      <p>検索したいキーワードを入力してください。</p>
+      <input type="search" name="search" placeholder="キーワードを入力">
+      <input type="submit" name="submit" value="検索">
+    </form>
+    <input type="text" id="key" placeholder="ここにタイトルが入ります" name="field1">
+    <textarea id="memo" placeholder="ここにテキストが入ります"></textarea>
+    <input type="date" id="date" min= &{kyou};>
+    <ul>
+      <li id="save">Save</li>
+      <li id="clear">Clear</li> 
+    </ul> 
+  </main> -->
+
+  <!-- <form method="POST" action="example.cgi" name="form1" onsubmit="return check()">
+    <p>タイトル：<input type="text" name="key"  id="key" size="30"> （必須）</p>
+    <p>タスク：<textarea name="memo" id="memo" rows="5" cols="30"></textarea> （必須）</p>
+    <p>期限：<input type="date"  name="date" id="date" min= &{kyou};></p>
+    <p><input type="submit" value="記録" id="save"></p>
+  </form> -->
+  <form method="POST" action="example.cgi" name="form1" onsubmit="return check()">
+    <table class="ask" id="ask_table" rules="rows">
+      <tr align="left">
+        <th>タイトル</th>
+        <td><input type="text" name="key"  id="key" size="30"></td>
+      </tr>
+      <tr align="left">
+        <th>タスク</th>
+        <td><textarea name="memo" id="memo" rows="5" cols="30"></textarea></td>
+      </tr>
+      <tr align="left">
+        <th>期限</th>
+        <td><input type="date"  name="date" id="date" min= &{kyou};></textarea></td>
+      </tr>
+    </table>
+    <p><input type="submit" value="記録" id="save"></p>
+  </form>
+
+
+
+  <ul>
+    <!-- <li id="save">Save</li> -->
+    <li id="clear">Clear</li>
+  </ul>
+
+  <div class='memo'>
+    <li class="sample"><input type="checkbox" id ="c9" value="red" onclick="clickBtn9();clickBtn10()"><p id ="c10">サンプル：チェックすると取り消し線が付きます</p></li>
+    タスクを記録するとこの下に表示されます↓
+  </div>
+  <ul id="list">
+     <!-- <li class="sample"><input type="checkbox" id ="c9" value="red" onclick="clickBtn9();clickBtn10()"><p id ="c10">サンプル：チェックすると取り消し線が付きます</p></li> -->
+    <!-- ここに追加データが挿入される -->
+    <!-- listとついてるもののうち、チェックされたら取り消しせん -->
+  </ul>
+
+  <div id="QR">
+    <img src="" id="QR">
+  </div>
+
+  <div id="capacity">
+    
+  </div>
+
+
+  <script>
+
+    // function clickBtn9(){
+    //   var obj = document.getElementById(c9);
+    //   if(obj.style.textDecoration == "underline"){
+    //     obj.style.textDecoration = "none";
+    //   }else{
+    //     obj.style.textDecoration = "underline";
+    //   }
+    // }
+    // 画像アップロード
+    
+
+    //1.Save クリックイベント(P16)
+    var task = 0
+    var i = 0; 
+    $("#save").on("click", function () {
+    
+                    
+      // var input = document.getElementById("photoin").value; 
+      // var name = "photo_" + i; 
+      // localStorage.setItem(name, input);      
+      // $("#QR").src = window.localStorage[name]; 
+      // i++;
+
+      task = task + 1;
+      // task >= 3になったらメッセージ表示
+      if(task ==1){
+        $("#capacity").html("<b>まだまだ頑張れる！ファイト！</b>");
+        console.log("メッセージでます");
+      }else if(task ==2){
+        $("#capacity").html("<b>疲れたら、甘いものでも食べて、休んでくださいね。</b>");
+        $('#capacity').wrap('<div style="color: red;"></div>');
+      }else if(task >=3){
+        $("#capacity").html("<b>大丈夫ですか？仕事なんか放り出して、まとまった休みをとりましょう。</b>");
+        $('#capacity').html('<img src="./img/img1.jpg" alt="癒し画像">');
+        console.log("メッセージでます");
+      }
+      
+      // val()で値を取得する constは一度設定したら上書き不可
+      const key = $("#key").val();
+      const value = $("#memo").val();
+      const date = $("#date").val();
+      // html側で入力されたデータを取得して確認
+      console.log(key)
+      console.log(value)
+      console.log(date)
+      // console.log(date.valueAsNumber)
+      // データを保存する
+      localStorage.setItem(key, value, date); // 一覧表示に追加
+
+      //一覧表示に追加(テンプレートリテラルを使う)
+      const html = `
+      <li>
+        <span><input type="checkbox" id="c10" onclick="clickBtn11();clickBtn12()"></span>
+        <span>${key}</span>
+        <span>${value}</span>
+        <span>${date}</span>
+      </li>`
+
+      // htmlに埋め込む
+      $("#list").append(html);
+      // $("#key").val("");
+      // $("#memo").val(""); 
+      var key2 = document.getElementById("key");
+      key2.value = '';
+      var memo2 = document.getElementById("memo");
+      memo2.value = '';
+      // この↓消しちゃダメ
+    });
+
+    // クリック時の状態を判定して、反転
+    $("#hoge").on('click', function () {//タグの背景色変更
+    Myid=document.getElementById(hoge);
+    if(Myid.checked == true){
+        Myid.parentNode.style.backgroundColor = '#CC28A8';
+        Myid.parentNode.style.color = '#FFFFFF';
+    }else{
+        Myid.parentNode.style.backgroundColor = '#FFFFFF';//背景色
+        Myid.parentNode.style.color = '#333333';//文字色
+    }
+});
+
+var check = function(){
+
+  var flag = 0;
+  // 設定開始（必須にする項目を設定してください）
+  if(document.form1.key.value == ""){ // 「お名前」の入力をチェック
+    flag = 1;
+  }
+  else if(document.form1.memo.value == ""){ // 「パスワード」の入力をチェック
+    flag = 1;
+  }
+  else if(document.form1.date.value == ""){ // 「コメント」の入力をチェック
+    flag = 1;
+  }
+  // 設定終了
+  if(flag == 1){
+    window.alert('必須項目に未入力がありました'); // 入力漏れがあれば警告ダイアログを表示
+    return false; // 送信を中止
+  }
+  else{
+    return true; // 送信を実行
+  }
+}
+
+    // task >= 3になったらメッセージ表示
+    if(task >=1){
+        $("#capacity").html("<b>文字出力します。</b>");
+        console.log("メッセージでます");
+    }
+
+
+    $("#clear").on('click', function () {
+      // 「OK」時の処理開始 ＋ 確認ダイアログの表示
+      if(window.confirm('本当にデータを消去しますか？')){
+        window.alert('データを消去します'); // example_confirm.html へジャンプ
+        // 保存されたデータ（localStorage）を消す
+        localStorage.clear();
+        // 削除するときに、入力されている中身を空にする
+        var key = document.getElementById("key");
+        key.value = '';
+        var memo = document.getElementById("memo");
+        memo.value = '';
+        // taskを0にする
+        task = 0
+        //id="list"を削除する
+        $("#list").empty();
+        }
+        // 「OK」時の処理終了
+      // 「キャンセル」時の処理開始
+      else{
+      window.alert('キャンセルされました'); // 警告ダイアログを表示
+      }
+      // 「キャンセル」時の処理終了
+    });
+    // サンプル分
+    var td = "none";
+    function clickBtn9(){
+      if(td == "none"){
+        td = "line-through";
+      }else{
+        td = "none";
+      }
+      document.getElementById("c10").style.textDecoration = td;
+    }
+
+    var color = "blue";
+    function clickBtn10(){
+      if(color == "blue"){
+        color = "gray";
+      }else{
+        color = "blue";
+      }
+      document.getElementById("c10").style.color = color;
+    }
+    // リスト分
+    var te = "none";
+    function clickBtn11(){
+      if(te == "none"){
+        te = "line-through";
+      }else{
+        te = "none";
+      }
+      document.getElementById("list").style.textDecoration = te;
+    }
+
+    var colors = "blue";
+    function clickBtn12(){
+      if(colors == "blue"){
+        colors = "gray";
+      }else{
+        colors = "blue";
+      }
+      document.getElementById("list").style.color = colors;
+    }
+
+
+
+
+    //3.ページ読み込み：保存データ取得表示
+    for (let i = 0; i < localStorage.length; i++) {
+      // 保存されたデータのkeyを取得
+      const key = localStorage.key(i);
+
+      // 何が入っているか確認してみよう☺️
+      console.log();
+
+      // getItemのKeyを使って保存されたデータを全部取得
+      const value = localStorage.getItem(key);
+
+      // 何が入っているか確認してみよう☺️
+      const html = `
+      <li>
+        <span><input type="checkbox" id="c10"></span>
+        <span>${key}</span>
+        <span>${value}</span>
+      </li>`
+
+      // htmlに埋め込む
+      $("#list").append(html);
+      
+    }
+
+    // 4.今日の日付を取得
+    var today=new Date(); 
+
+    //年・月・日・曜日を取得
+    var year = today.getFullYear();
+    var month = today.getMonth()+1;
+    var week = today.getDay();
+    var day = today.getDate();
+
+    // var week_ja= new Array("日","月","火","水","木","金","土");
+
+    //年・月・日・曜日を書き出す
+    // var kyou = document.write(year+"-"+month+"-"+day);    
+    // var kyou = year+"-"+month+"-"+day;
+    // document.write(kyou); 
+
+    var kyou = year+"-"+month+"-"+day;
+    $("#date").attr("min", kyou);
+    // document.write(kyou);
+
+
+  </script>
+  <footer>
+    <!-- <small>memo</small> -->
+  </footer>
+</body>
+
+</html>
